@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "order-services-"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "order_services"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+sqlmodel = "^0.0.22"
+fastapi = "^0.115.2"
+aiokafka = "^0.11.0"
+uvicorn = {extras = ["binary"], version = "^0.31.1"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

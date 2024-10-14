@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "product-services-"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "product_services"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+aiokafka = "^0.11.0"
+fastapi = "^0.115.2"
+sqlmodel = "^0.0.22"
+uvicorn = {extras = ["binary"], version = "^0.31.1"}
+psycopg2 = "^2.9.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
