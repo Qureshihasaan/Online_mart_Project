@@ -13,6 +13,7 @@ sqlmodel = "^0.0.22"
 aiokafka = "^0.11.0"
 uvicorn = {extras = ["binary"], version = "^0.31.1"}
 psycopg2 = "^2.9.9"
+aiosmtplib = "^3.0.2"
 
 
 [build-system]

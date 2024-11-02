@@ -8,13 +8,13 @@ loop = asyncio.get_event_loop()
 logging.basicConfig(level=logging.INFO)
 
 
-async def consume_message(topic , bootstrapserver):
+async def consume_message(bootstrapserver):
     consumer = AIOKafkaConsumer(
-        topic, 
+        "product_topic", 
         bootstrap_servers=bootstrapserver,
-        group_id="inventory_service_group",
+        group_id="inventory_service",
         auto_offset_reset="earliest",
-        value_deserializer=lambda x: json.loads(x.decode('utf-8'))
+    
     )
     
     while True:

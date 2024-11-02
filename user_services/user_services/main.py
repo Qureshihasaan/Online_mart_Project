@@ -30,7 +30,7 @@ async def lifespan(app:FastAPI)->AsyncGenerator[None,None]:
 app : FastAPI = FastAPI(lifespan=lifespan , version="1.0.0")
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @app.post("/Signup" , status_code=status.HTTP_201_CREATED)

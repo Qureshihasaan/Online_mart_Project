@@ -108,23 +108,23 @@ services:
     volumes:
       - ./notification_services:/code
     depends_on:
-      - notification_db
+      # - notification_db
       - broker
     ports:
       - "8004:8000"
   
-  notification_db:
-    image: postgres:latest
-    restart : always
-    container_name: notification_db_container
-    environment:
-      - POSTGRES_USER=hasaanqureshi
-      - POSTGRES_PASSWORD=Abcd9196
-      - POSTGRES_DB=notification_service_db
-    ports:
-      - "5438:5432"
-    volumes:
-      - notification_db:/var/lib/postgresql/data
+  # notification_db:
+  #   image: postgres:latest
+  #   restart : always
+  #   container_name: notification_db_container
+  #   environment:
+  #     - POSTGRES_USER=hasaanqureshi
+  #     - POSTGRES_PASSWORD=Abcd9196
+  #     - POSTGRES_DB=notification_service_db
+  #   ports:
+  #     - "5438:5432"
+  #   volumes:
+  #     - notification_db:/var/lib/postgresql/data
 
   
   payment_services:
@@ -222,8 +222,8 @@ volumes:
     driver: local
   order_db:
     driver: local
-  notification_db:
-    driver: local
+  # notification_db:
+  #   driver: local
   payment_db:
     driver: local
     

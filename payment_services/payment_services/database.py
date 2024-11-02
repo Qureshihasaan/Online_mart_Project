@@ -1,6 +1,5 @@
 from datetime import datetime
 from sqlmodel import SQLModel , Field, Session , create_engine
-from typing import Optional
 from . import setting
 
 

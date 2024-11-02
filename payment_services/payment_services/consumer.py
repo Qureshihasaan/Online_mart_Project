@@ -10,6 +10,7 @@ logging.basicConfig(level=logging.INFO)
 
 async def consume_messages(topic , bootstarpserver)->AIOKafkaConsumer:
     consumer = AIOKafkaConsumer(
+        'payment_request',
         topic,
         bootstrap_servers=bootstarpserver,
         group_id="my-group",

@@ -8,8 +8,14 @@ except FileNotFoundError:
     config = Config("")
 
 
-DATA_BASE_URL =config("DATABASE_URL" , cast=Secret)
-BOOT_STRAP_SERVER =config("BOOTSTRAP_SERVER" , cast=str)
+DATA_BASE_URL =config("DATA_BASE_URL" , cast=Secret)
+
+BOOT_STRAP_SERVER =config("BOOT_STRAP_SERVER" , cast=str)
+
 KAFKA_ORDER_TOPIC =config("KAFKA_ORDER_TOPIC" , cast=str)
-KAFKA_CONSUMER_GROUP_ID_FOR_PRODUCT=config("KAFKA_CONSUMER_GROUP_ID_FOR_PRODUCT" , cast=str)
+
+KAFKA_CONSUMER_GROUP_ID_FOR_ORDER=config("KAFAK_CONSUMER_GROUP_ID_FOR_ORDER" , cast=str)
+
 TEST_DATABASE_URL =config("TEST_DATABASE_URL" , cast=Secret)
+
+# KAFKA_PAYMENT_TOPIC =config("PAYMENT_REQUEST_TOPIC", cast=str)
