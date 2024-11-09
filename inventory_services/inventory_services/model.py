@@ -5,12 +5,12 @@ class Stock_update(SQLModel , table = True):
     id : int = Field(default=None, primary_key=True)
     product_id : int 
     product_name : str
-    product_stock : int 
-    status : str
+    product_quantity : int 
+    status : str = Field(default="In Stock")
     
     
 class Inventory_update(SQLModel):
     product_id : int = None
-    product_stock : int = None
+    product_quantity : int = None
     status : str = None
     

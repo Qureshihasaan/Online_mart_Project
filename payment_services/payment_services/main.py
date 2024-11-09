@@ -10,12 +10,14 @@ from .model import Payment
 import json
 from fastapi import HTTPException
 from .consumer import consume_messages
+from . import setting
+from . kafka_event import publish_payment_event
 
 
 @asynccontextmanager
-async def lifespan(app:FastAPI)->AsyncGenerator[None,None]:
+async def lifespan(app : FastAPI)->AsyncGenerator[None,None]:
     print("Tables Creating...")
-    task = asyncio.create_task(consume_messages("my_topic3", "broker:19092"))
+    task = asyncio.create_task(consume_messages(setting.KAFKA_PAYMENT_TOPIC, setting.BOOTSTRAP_SERVER))
     create_db_and_tables()
     yield
 
@@ -36,27 +38,17 @@ async def create_payment(order_id : str , user_id : str , amount : str , session
     session.commit()
     payment.status = "Completed"
     session.add(payment)
-    publish_payment_event(payment)
     session.commit()
-    return {"payment_id": payment.id, "status":payment.status}
-
-
-def publish_payment_event(payment):
-    producer = kafka_producer(
-        bootstrap_servers=str("broker:19092"),
-        value_serializer=lambda v: json.dumps(v).encode("utf-8"),
-    )
-
     payment_event = {
         "payment_id": Payment.id,
         "order_id": Payment.order_id,
         "amount": Payment.amount,
         "status": Payment.status,
     }
+    publish_payment_event(payment_event)
+    return {"payment_id": payment.id, "status":payment.status}
 
-    producer.send("payment_events", payment_event)
-    producer.flush()
-    producer.close()
+    
 
 @app.get("/get_all_payment")
 async def get_all_payment(session : Annotated[Session, Depends(get_db)]):

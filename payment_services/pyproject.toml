@@ -12,7 +12,7 @@ sqlmodel = "^0.0.22"
 fastapi = "^0.115.2"
 aiokafka = "^0.11.0"
 uvicorn = {extras = ["binary"], version = "^0.31.1"}
-psycopg2 = "^2.9.10"
+psycopg2 = {extras = ["bianry"], version = "^2.9.10"}
 
 
 [build-system]

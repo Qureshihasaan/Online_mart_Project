@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 async def New_user_created_consumer()-> AIOKafkaConsumer:
     consumer = AIOKafkaConsumer(
         setting.KAFKA_TOPIC_FOR_NEW_USER,
-        bootstrap_servers=setting.KAFKA_BOOT_STRAP_SERVER,
+        bootstrap_servers=setting.KAFKA_BOOTSTRAP_SERVER,
         group_id=setting.KAFKA_CONSUMER_GROUP_ID_FOR_NEW_USER,
         auto_offset_reset="earliest"
     )

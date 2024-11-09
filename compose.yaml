@@ -146,7 +146,7 @@ services:
     environment:
       - POSTGRES_USER=hasaanqureshi
       - POSTGRES_PASSWORD=abcd9195
-      - POSTGRES_DB= payment_services_db
+      - POSTGRES_DB=payment_services_db
     ports:
       - "5439:5432"
     volumes:

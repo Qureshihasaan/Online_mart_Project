@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 async def kafka_order_Created_consumer()-> AIOKafkaConsumer:
     consumer = AIOKafkaConsumer(
     setting.KAFKA_TOPIC_FOR_ORDER_CREATED,
-    bootstrap_servers = setting.KAFKA_BOOT_STRAP_SERVER,
+    bootstrap_servers = setting.KAFKA_BOOTSTRAP_SERVER,
     group_id=setting.KAFKA_CONSUMER_GROUP_ID_FOR_ORDER_CREATED,
     auto_offset_reset="earliest",
     )
@@ -42,7 +42,7 @@ async def kafka_order_Created_consumer()-> AIOKafkaConsumer:
     async def kafka_order_cancelled_consumer()-> AIOKafkaConsumer:
         consumer = AIOKafkaConsumer(
         setting.KAFKA_TOPIC_FOR_ORDER_CANCELLED,
-        bootstrap_servers = setting.KAFKA_BOOT_STRAP_SERVER,
+        bootstrap_servers = setting.KAFKA_BOOTSTRAP_SERVER,
         group_id=setting.KAFKA_CONSUMER_GROUP_ID_FOR_ORDER_CANCELLED,
         auto_offset_reset="earliest",
         )

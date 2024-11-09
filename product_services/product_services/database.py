@@ -4,9 +4,10 @@ from .setting import DATA_BASE_URL
 # import json
 
 class Product(SQLModel , table = True):
-    id : Optional[int] = Field(default= None , primary_key=True)
+    product_id : Optional[int] = Field(default= None , primary_key=True)
     Product_name : str = Field(default=None)
     Product_details : str = Field(default=None)
+    product_quantity : int = Field(default=0)
     # created_at = Field(default= datetime.now)
     price : float = Field(gt=0)
 

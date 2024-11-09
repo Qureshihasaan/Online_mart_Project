@@ -5,7 +5,6 @@ from sqlmodel import  Session
 from .database import engine
 from .send_email import send_email
 import asyncio , logging
-from aiokafka import AIOKafkaConsumer
 from .Consumer import kafka_order_consumer , kafka_payment_consumer , kafka_user_consumer
 
 loop = asyncio.get_event_loop()

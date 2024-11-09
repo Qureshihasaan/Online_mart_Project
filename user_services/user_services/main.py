@@ -15,14 +15,18 @@ from sqlmodel import Session , select
 import json
 from jose import JWTError
 from psycopg2 import IntegrityError
-
+from . import setting
 
 
 
 @asynccontextmanager
 async def lifespan(app:FastAPI)->AsyncGenerator[None,None]:
     print("Creating Tables...")
-    task = asyncio.create_task(consume("my-topic" , "broker:19092"))
+    task = asyncio.create_task(consume(
+            # setting.KAFKA_USER_TOPIC,
+            # setting.BOOTSTRAP_SERVER
+            )
+    )
     create_db_and_tables()
     yield
 
@@ -50,6 +54,11 @@ async def create_user(user : CreateUser,
     except IntegrityError:
         db.rollback()
         raise HTTPException(status_code=400 , detail="User Already Exists...")
+    user_created_event={
+        "event_type":"UserCreated",
+        "username" :  user.username,
+        "email" : user.email
+    }
     return {"message" : "User Account Created Successfully"}    
 
 
@@ -105,3 +114,13 @@ def read_user(token : Annotated[str, Depends(oauth2_scheme)], db : Annotated[Ses
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+
+@app.delete("/user/delete/{user_id}")
+async def delete_user(user_id : int, db : Annotated[Session, Depends(get_session)]):
+    user = db.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.delete(user)
+    db.commit()
+    return {"message" : "User Deleted Successfully"}
