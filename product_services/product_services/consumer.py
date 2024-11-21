@@ -1,7 +1,7 @@
 import logging , asyncio
 from aiokafka import AIOKafkaConsumer
 from aiokafka.errors import KafkaConnectionError
-
+from . import setting
 
 
 loop = asyncio.get_event_loop()
@@ -11,7 +11,7 @@ async def consume_messages(topic , bootstrapserver)->AIOKafkaConsumer:
      consumer = AIOKafkaConsumer(
           topic,
           bootstrap_servers=bootstrapserver,
-          group_id= "my_group",
+          group_id= setting.KAFKA_CONSUMER_GROUP_ID_FOR_PRODUCT,
           auto_offset_reset= "earliest"
           
      )

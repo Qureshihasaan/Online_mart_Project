@@ -36,18 +36,29 @@ def get_db():
 async def product_service(product : Product , producer : Annotated[AIOKafkaProducer , Depends(kafka_producer)],
                           session : Annotated[Session , Depends(get_db)]
                           )->Product:
-     product_dict = {
-         "event_type" : "product_created",
-     #     field : getattr(product , field) for field in product.dict()
-          **product.dict()
-     }
-     product_json = json.dumps(product_dict).encode("utf-8")
-     print("Product_json" , product_json)
-     await producer.send_and_wait("product_topic" , product_json) #producer
-     session.add(product)
-     session.commit()
-     session.refresh(product) 
-     return product
+    # event={
+    #     "product_id" : product.product_id,
+    #     "product_name" : product.Product_name,
+    #     "product_price" : product.price,
+    #     "product_quantity" : product.product_quantity,
+    #     "event_type" : "Product_created"
+    # }
+
+    # product_dict = {
+    #      "event_type" : "product_created",
+    #  #     field : getattr(product , field) for field in product.dict()
+    #       **product.dict()
+    #  }
+    product_dict = {field : getattr(product, field) for field in product.dict()}
+    product_json = json.dumps(product_dict).encode("utf-8")
+    print("Product_json" , product_json)
+    session.add(product)
+    session.commit()
+    session.refresh(product) 
+    event = {"event_type" : "Product_Created" , "product" : product.dict()}
+    await producer.send_and_wait("product_topic" ,  json.dumps(event).encode("utf-8")) #producer
+    print("Product Send to Kafka topic")
+    return product
 
 
 @app.get("/product/" , response_model=list[Product])

@@ -10,3 +10,5 @@ async def kafka_producer():
           await producer.stop() 
 
 
+# def send_message(product : Product):
+#      kafka_producer.send("product_topic" , product)
