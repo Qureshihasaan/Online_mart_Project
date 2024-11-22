@@ -4,7 +4,7 @@ from aiokafka.errors import KafkaConnectionError
 from . import setting
 from .database import engine
 from sqlmodel import Session
-from .model import Stock_update
+from .model import Stock_update , Inventory_update
 import json
 
 
@@ -38,6 +38,20 @@ async def consume_product_events():
                 product = event["product"]
                 add_inventory(product["product_id"] ,product["Product_name"] , product["product_quantity"] )
                 print("Product added to inventory..")
+
+            elif event["event_type"] == "Product_Updated":
+                product = event["product"]
+                update_inventory(
+                    product["product_id"],
+                    product["Product_name"],
+                    product["product_quantity"]
+                )
+                print("Inventory Updated for product...")
+            
+            elif event["event_type"] == "Product_Deleted":
+                product = event["product"]
+                delete_inventory(product["product_id"])
+                print("Product deleted from inventory...")
     finally:
         await consumer.stop()
 
@@ -52,8 +66,36 @@ def add_inventory(product_id, Product_name , product_quantity):
         print("Product Added to Inventory...")
 
 
+def update_inventory(product_id , product_name , product_quantity):
+    with Session(engine) as session:
+        inventory_item = session.query(Stock_update).filter(Stock_update.product_id == product_id).first()
+        # if inventory_item:
+        #     # inventory_item.product_name = product_name
+        #     inventory_item = Stock_update(product_id=product_id, product_quantity=product_quantity)
+        #     session.add(inventory_item)
+        #     session.commit()
+        #     session.refresh(inventory_item)
+        if inventory_item:
+            # Update existing fields
+            inventory_item.product_name = product_name
+            inventory_item.product_quantity = product_quantity
+            session.commit()
+            print("Product Updated in Inventory...")
+
+        # inventory_item = session.query(Stock_update).filter(Stock_update.product_id == product_id).first()
+        # if inventory_item:
+        #     inventory_item = Stock_update(product_id=product_id, product_name=product_name, product_quantity=product_quantity)
+        #     session.commit()
+        #     print("Product Updated in Inventory...")
 
 
+def delete_inventory(product_id):
+    with Session(engine) as session:
+        inventory_item = session.query(Stock_update).filter(Stock_update.product_id == product_id).first()
+        if inventory_item:
+            session.delete(inventory_item)
+            session.commit()
+            print("Product Deleted from Inventory...")
 
 
 
@@ -164,3 +206,4 @@ def add_inventory(product_id, Product_name , product_quantity):
 #             session.add(inventory_item)
 #             session.commit()
 #             print(f"Product added to inventory: {inventory_item}")
+

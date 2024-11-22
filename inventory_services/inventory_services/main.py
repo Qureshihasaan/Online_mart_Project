@@ -80,24 +80,24 @@ def get_stock_update(db : Annotated[Session, Depends(get_db)]):
     stock = db.exec(select(Stock_update)).all()
     return stock
 
-@app.delete("/stock_delete{stock_id}")
-async def delete_stock(stock_id : int , session : Annotated[Session , Depends(get_db)],
-                       producer : Annotated[AIOKafkaProducer, Depends(kafka_producer1)]
-                       ):
-    db_product = session.get(Stock_update, stock_id)
-    if not db_product:
-        raise HTTPException(status_code=404, detail = "Product Not Found")
-    product_dict = {
-         "event_type" : "stock_deleted",
-          "stock_id" : stock_id
-         }
-    product_json = json.dumps(product_dict).encode("utf-8")
-    print("product_json" , product_json)
-    await producer.send_and_wait(setting.KAFKA_PRODUCT_TOPIC
-                                 , db_product)
-    session.delete(db_product)
-    session.commit()
-    return db_product
+# @app.delete("/stock_delete{stock_id}")
+# async def delete_stock(stock_id : int , session : Annotated[Session , Depends(get_db)],
+#                        producer : Annotated[AIOKafkaProducer, Depends(kafka_producer1)]
+#                        ):
+#     db_product = session.get(Stock_update, stock_id)
+#     if not db_product:
+#         raise HTTPException(status_code=404, detail = "Product Not Found")
+#     product_dict = {
+#          "event_type" : "stock_deleted",
+#           "stock_id" : stock_id
+#          }
+#     product_json = json.dumps(product_dict).encode("utf-8")
+#     print("product_json" , product_json)
+#     await producer.send_and_wait(setting.KAFKA_INVENTORY_TOPIC
+#                                  , json.dumps(product_dict).encode("utf-8"))
+#     session.delete(db_product)
+#     session.commit()
+#     return db_product
 
 # @app.put("/stock_update/{stock_id}" , response_model = stock_update)
 # async def update_stock(stock_id : int , item_stock_update : stock_update,
