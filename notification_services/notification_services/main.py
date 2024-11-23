@@ -2,10 +2,11 @@ from contextlib import asynccontextmanager
 from typing import  AsyncGenerator
 from fastapi import  FastAPI
 from sqlmodel import  Session
-from .database import engine
-from .send_email import send_email
+from .database import engine , create_db_and_tables
+# from .email_services import send_email
 import asyncio , logging
-from .Consumer import kafka_order_consumer , kafka_payment_consumer , kafka_user_consumer
+from .Consumer.kafka_user_consumer import New_user_created_consumer
+from . import setting
 
 loop = asyncio.get_event_loop()
 logging.basicConfig(level=logging.INFO)
@@ -15,21 +16,24 @@ logging.basicConfig(level=logging.INFO)
 
 @asynccontextmanager
 async def lifespan(app : FastAPI)->AsyncGenerator[None,None]:
-   loop = asyncio.get_event_loop()
-   task1 = loop.create_task(kafka_user_consumer.New_user_created_consumer())
-   task2 = loop.create_task(kafka_order_consumer.kafka_order_Created_consumer())
-   task3 = loop.create_task(kafka_payment_consumer.kafka_payment_consumer())
+#    loop = asyncio.get_event_loop()
+#    task1 = loop.create_task(kafka_user_consumer.New_user_created_consumer())
+#    task2 = loop.create_task(kafka_order_consumer.kafka_order_Created_consumer())
+#    task3 = loop.create_task(kafka_payment_consumer.kafka_payment_consumer())
+   print("Tables Creating...")
+   task = asyncio.create_task(New_user_created_consumer())
+#    create_db_and_tables()
+   yield
    
-   
-   try:
-       yield
-   finally:
-       for task in [task1, task2, task3]:
-           task.cancel()
-           try:
-               await task
-           except asyncio.CancelledError:
-               pass
+#    try:
+#        yield
+#    finally:
+#        for task in [task1, task2, task3]:
+#            task.cancel()
+#            try:
+#                await task
+#            except asyncio.CancelledError:
+#                pass
 
 
 
@@ -47,6 +51,10 @@ def get_db():
 @app.get("/")
 def get_root():
     return{"message" : "Welcome To Notification Service..."}
+
+
+# @app.get("/get_notification")
+# def 
 
 # @app.on_event("startup")
 # async def startup_event():

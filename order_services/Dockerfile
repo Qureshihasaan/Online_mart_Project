@@ -17,6 +17,9 @@ RUN pip install poetry
 COPY . /code/
 
 
+RUN pip install pydantic[email]
+
+
 RUN poetry config virtualenvs.create false
 
 

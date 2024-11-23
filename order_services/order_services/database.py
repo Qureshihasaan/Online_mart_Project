@@ -1,11 +1,13 @@
 from sqlmodel import SQLModel, Field , create_engine
 from .setting import DATA_BASE_URL
 from typing import Optional
+from pydantic import EmailStr
 
 class Order(SQLModel , table=True):
     id : Optional[int] = Field(default=None, primary_key=True)
     user_id : int 
     # order_id : Optional[int] = Field(default=None , primary_key=True)
+    user_email : EmailStr = Field(index=True , nullable=False , unique=True)
     product_id : int 
     total_amount : int = Field(default = None)
     product_quantity : int = Field(default=None)
@@ -29,5 +31,3 @@ engine =create_engine(connection_string , connect_args={} , pool_recycle=300)
 
 def create_db_and_tables()->None:
     SQLModel.metadata.create_all(engine)
-
-

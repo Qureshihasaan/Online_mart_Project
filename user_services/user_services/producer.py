@@ -4,7 +4,7 @@ import json
 
 async def kafka_producer():
     producer = AIOKafkaProducer(bootstrap_servers=setting.BOOTSTRAP_SERVER,
-                        value_serializer=lambda v: json.dumps(v).encode('utf-8'),                            
+                        # value_serializer=lambda v: json.dumps(v).encode('utf-8'),                            
                                 )
     await producer.start()
     try:
@@ -14,12 +14,12 @@ async def kafka_producer():
 
 
 
-def publish(topic: str, event : dict):
-    producer = AIOKafkaProducer(bootstrap_servers=setting.BOOTSTRAP_SERVER,
-                        value_serializer=lambda v: json.dumps(v).encode('utf-8'),
-                                )
-    try:
-        producer.send_and_wait(topic, event)
-        producer.flush()
-    finally:
-        producer.stop()  
+# def publish(topic: str, event : dict):
+#     producer = AIOKafkaProducer(bootstrap_servers=setting.BOOTSTRAP_SERVER,
+#                         value_serializer=lambda v: json.dumps(v).encode('utf-8'),
+#                                 )
+#     try:
+#         producer.send_and_wait(topic, event)
+#         producer.flush()
+#     finally:
+#         producer.stop()  

@@ -11,25 +11,25 @@ logging.basicConfig(level=logging.INFO)
 async def send_email(user_email : str , body : str , subject : str):
     try:
         sender_email = setting.SENDER_EMAIL
-        Receiver_email = user_email
+        # Receiver_email = user_email
         sender_password = setting.SENDER_PASSWORD
-        subject = subject
-        body = body
+        # subject = subject
+        # body = body
 
 
         message = MIMEText(body , "plain")
         message["Subject"] = subject
         message["From"] = sender_email
-        message["To"] = Receiver_email
+        message["To"] = user_email
 
-        with smtplib.SMTP("smtp.google.com", 456) as server:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
             server.starttls()
             server.login(sender_email, sender_password)
-            server.sendmail(sender_email, Receiver_email, message.as_string())
-            logging.info(f"Sending Email to {Receiver_email} with Subject: {subject}")
+            server.sendmail(sender_email, user_email, message.as_string())
+            logging.info(f"Sending Email to {user_email} with Subject: {subject}")
         logging.info("Email Sent Successfully...")
     except Exception as e:
-        print(f"Error sending email to {Receiver_email}: {str(e)}")
+        print(f"Error sending email to {user_email}: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to send Email")
 
 

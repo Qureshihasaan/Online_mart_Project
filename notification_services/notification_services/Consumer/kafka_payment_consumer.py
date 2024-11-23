@@ -2,7 +2,7 @@ from aiokafka import AIOKafkaConsumer
 import asyncio , logging 
 from .. import setting
 from aiokafka.errors import KafkaConnectionError    
-from .. import send_email
+from .. import email_services
 
 loop = asyncio.get_event_loop()
 logging.basicConfig(level=logging.INFO)
@@ -29,7 +29,7 @@ async def kafka_payment_consumer()->AIOKafkaConsumer:
         async for msg in consumer:
             event = msg.value
             print("event", event) 
-            send_email(
+            email_services(
                 to=event["email"],
                 subject="Payment Done",
                 body=f"Your Payment Has Been Done Successfully.Best regards,\nThe Online Mart Team",

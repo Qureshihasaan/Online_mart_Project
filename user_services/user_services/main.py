@@ -16,7 +16,7 @@ import json
 from jose import JWTError
 from psycopg2 import IntegrityError
 from . import setting
-
+from .producer import kafka_producer
 
 
 @asynccontextmanager
@@ -39,7 +39,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @app.post("/Signup" , status_code=status.HTTP_201_CREATED)
 async def create_user(user : CreateUser,
-                      db : Annotated[Session, Depends(get_session)]
+                      db : Annotated[Session, Depends(get_session)],
+                      producer: Annotated[AIOKafkaProducer, Depends(kafka_producer)]
                       )->dict:
     if not user.username or not user.plain_password:
         raise HTTPException(status_code=400 , detail="Please Enter Username or Password....")
@@ -48,17 +49,20 @@ async def create_user(user : CreateUser,
         email = user.email,
         hashed_password = bcrypt_context.hash(user.plain_password),
     )
+    user_dict = {field : getattr(create_user, field) for field in create_user.dict()}
+    user_json = json.dumps(user_dict).encode("utf-8")
     db.add(create_user)
     try:
         db.commit()
     except IntegrityError:
         db.rollback()
         raise HTTPException(status_code=400 , detail="User Already Exists...")
-    user_created_event={
-        "event_type":"UserCreated",
-        "username" :  user.username,
+    event = {"event_type" : "User_Created" , "user" : {
+        "username" : user.username,
         "email" : user.email
-    }
+    }}
+    await producer.send_and_wait(setting.KAFKA_USER_TOPIC , json.dumps(event).encode("utf-8"))
+    print("User_data send to kafka topic...")
     return {"message" : "User Account Created Successfully"}    
 
 
