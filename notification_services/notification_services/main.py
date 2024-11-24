@@ -5,8 +5,8 @@ from sqlmodel import  Session
 from .database import engine , create_db_and_tables
 # from .email_services import send_email
 import asyncio , logging
-from .Consumer.kafka_user_consumer import New_user_created_consumer
 from . import setting
+from .Consumer import kafka_user_consumer , kafka_order_consumer
 
 loop = asyncio.get_event_loop()
 logging.basicConfig(level=logging.INFO)
@@ -16,15 +16,30 @@ logging.basicConfig(level=logging.INFO)
 
 @asynccontextmanager
 async def lifespan(app : FastAPI)->AsyncGenerator[None,None]:
-#    loop = asyncio.get_event_loop()
-#    task1 = loop.create_task(kafka_user_consumer.New_user_created_consumer())
-#    task2 = loop.create_task(kafka_order_consumer.kafka_order_Created_consumer())
-#    task3 = loop.create_task(kafka_payment_consumer.kafka_payment_consumer())
-   print("Tables Creating...")
-   task = asyncio.create_task(New_user_created_consumer())
-#    create_db_and_tables()
-   yield
+    print("Tables Creating...")
+    loop = asyncio.get_event_loop()
+    task1 = loop.create_task(kafka_user_consumer.New_user_created_consumer())
+    task2 = loop.create_task(kafka_order_consumer.kafka_order_Created_consumer())
+    logging.info("Kafka consumers started...")
+
+    try:
+        yield  # Application runs while tasks are alive
+    finally:
+        logging.info("Shutting down Kafka consumers...")
+        
+        # Cancel tasks gracefully
+        for task in [task1, task2]:
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                logging.info(f"Task {task} cancelled successfully.")
+        
+        logging.info("Application lifespan ended.")
    
+#    task3 = loop.create_task(kafka_payment_consumer.kafka_payment_consumer())
+#    task = asyncio.create_task(New_user_created_consumer())
+#    create_db_and_tables()
 #    try:
 #        yield
 #    finally:

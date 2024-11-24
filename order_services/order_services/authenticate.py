@@ -5,47 +5,47 @@ from typing import Annotated
 import os
 from typing import Optional
 from datetime import datetime, timedelta
+from passlib.context import CryptContext
 
 SECRET_KEY = os.environ.get("SECRET_KEY")   
 ALGORITHM = os.environ.get("ALGORITHM")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hash_password(password : str)->str:
+    return pwd_context.hash(password)
+
+def verify_password(plain_password: str, hashed_password: str)->bool:
+    return pwd_context.verify(plain_password, hashed_password)
 
 
-def verify_token(token : Annotated[str, Depends(oauth2_scheme)]):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+
+def verify_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str|None = payload.get("sub")
-        if username is None:
-            raise credentials_exception
+        return payload
     except JWTError:
-        raise credentials_exception
-    return username
-    #     return payload
-    # except JWTError:
-    #     raise HTTPException(status_code=401, detail="Token has expired")
-    # except JWTError:
-    #     raise HTTPException(status_code=401, detail="Invalid token...")
-
-# async def get_current_user(token: str = Depends(oauth2_scheme)):
-#     try:
-#         payload = verify_token(token)
-#         user_id = payload.get("sub")
-#         if user_id is None:
-#             raise HTTPException(status_code=401, detail="Invalid token....")
-#         return user_id
+        raise ValueError("Invalid or expired token")
+        
     
-#     except Exception as e:
-#         raise HTTPException(status_code=401, detail="Invalid token.")
-
-def verify_refresh_token(token : str):
+async def get_current_user(token : str= Depends(oauth2_scheme)):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload.get("sub")
-    except JWTError:
-        return None
+        payload = verify_token(token)
+        return payload
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

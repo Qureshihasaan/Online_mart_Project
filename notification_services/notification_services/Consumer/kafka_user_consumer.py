@@ -34,13 +34,19 @@ async def New_user_created_consumer()-> AIOKafkaConsumer:
             if event["event_type"] == "User_Created":
                 user_data = event.get("user", {})
                 user_email = user_data.get("email")
+                user_name = user_data.get("username")
+
                 if not user_email:
                     logging.warning("Email not found in event. Skipping...")
                     continue
                 subject = "Welcome to Online Mart"
                 body = (
-                    "Welcome to Online Mart!\n\n"
-                    "Thank you for joining us. We are excited to have you on board.\n\n"
+                    f"Dear {user_name},\n\n"
+                    "Your Account Has Been Created Successfully.\n\n"
+                    "We are excited to have you on board. Here are your details.\n\n"
+                    f"- Name: {user_name}\n"
+                    f"- Email: {user_email}\n\n"
+                    "Thank you for joining us!\n\n"
                     "Best regards,\nThe Online Mart Team"
                 )
                 try:

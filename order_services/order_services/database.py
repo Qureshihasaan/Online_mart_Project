@@ -1,10 +1,10 @@
 from sqlmodel import SQLModel, Field , create_engine
 from .setting import DATA_BASE_URL
 from typing import Optional
-from pydantic import EmailStr
+from pydantic import EmailStr , BaseModel
 
 class Order(SQLModel , table=True):
-    id : Optional[int] = Field(default=None, primary_key=True)
+    order_id : Optional[int] = Field(default=None, primary_key=True)
     user_id : int 
     # order_id : Optional[int] = Field(default=None , primary_key=True)
     user_email : EmailStr = Field(index=True , nullable=False , unique=True)
@@ -17,9 +17,13 @@ class Order(SQLModel , table=True):
 
 class Order_request(SQLModel):
     order_id : int
-    product_quantity : str
+    product_quantity : int
     payment_status : str
     total_amount : int
+
+class User(BaseModel):
+    username : str
+    password : str
 
 
 connection_string = str(DATA_BASE_URL).replace(
