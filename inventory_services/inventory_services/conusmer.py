@@ -57,6 +57,9 @@ async def consume_product_events():
 
 
 
+
+
+
 def add_inventory(product_id, Product_name , product_quantity):
     with Session(engine) as session:
         # inventory_item = session.query(Stock_update).filter(Stock_update.product_id == product_id).first()

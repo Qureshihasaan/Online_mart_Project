@@ -34,7 +34,7 @@ async def lifespan(app:FastAPI)->AsyncGenerator[None,None]:
 app : FastAPI = FastAPI(lifespan=lifespan , version="1.0.0")
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 
 @app.post("/Signup" , status_code=status.HTTP_201_CREATED)
@@ -68,15 +68,47 @@ async def create_user(user : CreateUser,
 
 
 
-@app.post("/token" , response_model=Token)
+# @app.post("/Signup" , status_code=status.HTTP_201_CREATED)
+# async def create_user(username : str , email : str , password : str ,
+#                       db : Annotated[Session, Depends(get_session)],
+#                       producer: Annotated[AIOKafkaProducer, Depends(kafka_producer)]
+#                       )->dict:
+#     if not username or not password:
+#         raise HTTPException(status_code=400 , detail="Please Enter Username or Password....")
+#     create_user = User(
+#         username = username,
+#         email = email,
+#         hashed_password = bcrypt_context.hash(password),
+#     )
+#     user_dict = {field : getattr(create_user, field) for field in create_user.dict()}
+#     user_json = json.dumps(user_dict).encode("utf-8")
+#     db.add(create_user)
+#     try:
+#         db.commit()
+#     except IntegrityError:
+#         db.rollback()
+#         raise HTTPException(status_code=400 , detail="User Already Exists...")
+#     event = {"event_type" : "User_Created" , "user" : {
+#         "username" : username,
+#         "email" : email
+#     }}
+#     await producer.send_and_wait(setting.KAFKA_USER_TOPIC , json.dumps(event).encode("utf-8"))
+#     print("User_data send to kafka topic...")
+#     return {"message" : "User Account Created Successfully"}    
+
+
+
+
+
+@app.post("/login" , response_model=Token)
 async def login_with_token(form_data : Annotated[OAuth2PasswordRequestForm,Depends()],
                            db : Annotated[Session, Depends(get_session)]
                            )->Token:
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could Not Validate User")
-    token = create_access_token(user.username, user.id , timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    return {"access_token" : token, "token_type" : "bearer"}
+    access_token = create_access_token(user.username , user.id , timedelta(minutes= ACCESS_TOKEN_EXPIRE_MINUTES))
+    return {"access_token" : access_token, "token_type" : "bearer"}
 
 # @app.post("/token" , response_model=Token)
 # async def login_with_token(form_data : Annotated[OAuth2PasswordRequestForm,Depends()],
@@ -119,6 +151,16 @@ def read_user(token : Annotated[str, Depends(oauth2_scheme)], db : Annotated[Ses
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
+
+@app.get("/user/{user_id}")
+async def get_user_details(user_id : int, db : Annotated[Session, Depends(get_session)],
+                           token : Annotated[str, Depends(oauth2_scheme)],
+                           ):
+    user_token_data = decode_access_token(token)
+    user = db.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
 @app.delete("/user/delete/{user_id}")
 async def delete_user(user_id : int, db : Annotated[Session, Depends(get_session)]):

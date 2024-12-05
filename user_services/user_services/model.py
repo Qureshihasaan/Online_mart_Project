@@ -1,6 +1,8 @@
 from sqlmodel import SQLModel ,Field
 from typing import Optional
 from pydantic import EmailStr
+import uuid
+from uuid import UUID
 
 class User(SQLModel , table = True):
     id : Optional[int] = Field(default=None , primary_key=True, index=True)

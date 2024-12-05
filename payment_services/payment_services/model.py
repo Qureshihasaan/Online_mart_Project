@@ -1,15 +1,19 @@
 from sqlmodel import SQLModel , Field
 from typing import Optional
-# from datetime import datetime
-import uuid
+from pydantic import EmailStr
 
 
 
 class Payment(SQLModel , table=True):
-    id : Optional[int] = Field(default_factory=lambda:str(uuid.uuid4()) , primary_key=True)
-    user_id : str 
-    order_id : str 
-    amount : str 
-    status : str         ### Pending    Completed      Failed
-    # created_at : datetime = Field(default_factory=datetime.utcnow)
-    # updated_at : datetime = Field(default_factory=datetime.utcnow)
+    payment_id : Optional[int] = Field(index=True, primary_key=True)
+    # user_email : str 
+    order_id : int 
+    amount : float 
+    status : str = Field(default="Pending")       ### Pending    Completed      Failed
+    
+
+class payment_response(SQLModel):
+    payment_id : int
+    order_id : int
+    amount : float
+    status : str

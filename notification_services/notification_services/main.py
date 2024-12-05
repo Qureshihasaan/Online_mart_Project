@@ -6,12 +6,10 @@ from .database import engine , create_db_and_tables
 # from .email_services import send_email
 import asyncio , logging
 from . import setting
-from .Consumer import kafka_user_consumer , kafka_order_consumer
+from .Consumer import kafka_user_consumer , kafka_order_consumer , kafka_payment_consumer
 
 loop = asyncio.get_event_loop()
 logging.basicConfig(level=logging.INFO)
-
-
 
 
 @asynccontextmanager
@@ -20,6 +18,7 @@ async def lifespan(app : FastAPI)->AsyncGenerator[None,None]:
     loop = asyncio.get_event_loop()
     task1 = loop.create_task(kafka_user_consumer.New_user_created_consumer())
     task2 = loop.create_task(kafka_order_consumer.kafka_order_Created_consumer())
+    task3 = loop.create_task(kafka_payment_consumer.kafka_payment_consumer())
     logging.info("Kafka consumers started...")
 
     try:

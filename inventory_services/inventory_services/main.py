@@ -80,6 +80,19 @@ def get_stock_update(db : Annotated[Session, Depends(get_db)]):
     stock = db.exec(select(Stock_update)).all()
     return stock
 
+
+
+# @app.get("/check_inventory")
+# async def check_inventory(product_id : int , quantity : int):
+#     with Session(engine) as session:
+#         # statement = select(Stock_update).where(Stock_update.product_id == product_id)
+#         # stock = session.exec(statement).first()
+#         product = session.get(Stock_update, product_id)
+#         if product and product.product_quantity >= quantity:
+#             return {"available": True}
+#         else:
+#             return {"available": False}
+
 # @app.delete("/stock_delete{stock_id}")
 # async def delete_stock(stock_id : int , session : Annotated[Session , Depends(get_db)],
 #                        producer : Annotated[AIOKafkaProducer, Depends(kafka_producer1)]

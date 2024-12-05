@@ -4,14 +4,14 @@ from contextlib import asynccontextmanager
 from typing import Annotated, AsyncGenerator
 from sqlmodel import Session, select
 from .producer import kafka_producer
-from .database import create_db_and_tables, get_db
+from .database import create_db_and_tables, get_db 
 import asyncio
-from .model import Payment
+from .model import Payment , payment_response
 import json
 from fastapi import HTTPException
 from .consumer import consume_messages
 from . import setting
-from . kafka_event import publish_payment_event
+
 
 
 @asynccontextmanager
@@ -27,26 +27,32 @@ app : FastAPI = FastAPI(lifespan=lifespan , version="1.0.0")
 
 
 
-@app.post("/create_payment/")
-async def create_payment(order_id : str , user_id : str , amount : str , session : Annotated[Session, Depends(get_db)],
+@app.post("/create_payment/" , response_model=payment_response)
+async def create_payment(payment : Payment, session : Annotated[Session, Depends(get_db)],
                          producer : Annotated[AIOKafkaProducer, Depends(kafka_producer)]
                          ):
-    payment = Payment(user_id=user_id, order_id=order_id, amount=amount , status="Pending")
+    # payment = Payment(user_id=user_id, order_id=order_id, amount=amount , status="Pending")
     payment_dict = {field : getattr (payment, field) for field in payment.dict()}
     payment_json = json.dumps(payment_dict).encode("utf-8")
-    session.add(Payment)
-    session.commit()
-    payment.status = "Completed"
+    print("Payment_json" , payment_json)
     session.add(payment)
     session.commit()
-    payment_event = {
-        "payment_id": Payment.id,
-        "order_id": Payment.order_id,
-        "amount": Payment.amount,
-        "status": Payment.status,
-    }
-    publish_payment_event(payment_event)
-    return {"payment_id": payment.id, "status":payment.status}
+    session.refresh(payment)
+    try:
+        event = {"event_type" : "Payment_Created" , "payment" : payment.dict()}
+        await producer.send_and_wait(setting.KAFKA_PAYMENT_TOPIC, json.dumps(event).encode('utf-8'))
+        print("Payment Details Send to kafka topic....")
+    except Exception as e:
+        print(f"Error Sending to Kafka {e}")
+        session.rollback()
+        raise HTTPException(status_code=500, detail="Error Sending payment to kafka..")
+    return payment
+    # payment.status = "Completed"
+    # session.add(payment)
+    # session.commit()
+    
+
+    # return {"payment_id": payment.id, "status":payment.status}
 
     
 

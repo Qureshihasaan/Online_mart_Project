@@ -5,7 +5,7 @@ from aiokafka.errors import KafkaConnectionError
 from ..email_services import send_email
 from .. import setting
 import json
-
+import aiohttp
 
 loop = asyncio.get_event_loop()
 logging.basicConfig(level=logging.INFO)
@@ -34,7 +34,8 @@ async def kafka_order_Created_consumer()-> AIOKafkaConsumer:
             print(f"Event Received: {event}")
             if event["event_type"] == "Order_Created":
                 user_data= event.get("order", {})
-                user_email =user_data.get("user_email")
+                # user_id =user_data.get("id")
+                user_email = user_data.get("user_email")
                 order_id = user_data.get("order_id")
                 product_id = user_data.get("product_id")
                 total_amount = user_data.get("total_amount")
@@ -68,6 +69,7 @@ The Online Mart Team
                     logging.error(f"Failed to send order confirmation email to {user_email}: {email_error}")
             elif event["event_type"] == "Order_Deleted":
                 user_data = event.get("order", {})
+                # user_id = user_data.get("id")
                 user_email = user_data.get("user_email")
                 order_id = user_data.get("order_id")
                 product_id = user_data.get("product_id")
@@ -109,3 +111,16 @@ The Online Mart Team
         logging.info("Consumer Stopped...")
 
 
+# async def get_user_email(user_id: int):
+#     try:
+#         async with aiohttp.ClientSession() as session:
+#             async with session.get(f"{user_id}") as response:
+#                 if response.status == 200:
+#                     user_data = await response.json()
+#                     return user_data.get("email")
+#                 else:
+#                     logging.error(f"Failed to fetch user data. Status code: {response.status}")
+#                     return None
+#     except Exception as e:
+#         logging.error(f"Error fetching user data: {e}")
+#         return None
