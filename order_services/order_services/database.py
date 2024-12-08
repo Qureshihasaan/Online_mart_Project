@@ -30,6 +30,16 @@ class OrderResponse(SQLModel):
     payment_status : str
 
 
+class User(SQLModel):
+    # id : Optional[int] = Field(default=None , primary_key=True, index=True)
+    username : str = Field(index=True , unique=True , nullable=False)
+    # email : EmailStr = Field(index=True, nullable=False , unique=True)
+    hashed_password : str
+
+class create_user(SQLModel):
+    username : str
+    password : str
+
 # class User(BaseModel):
 #     username : str
 #     password : str

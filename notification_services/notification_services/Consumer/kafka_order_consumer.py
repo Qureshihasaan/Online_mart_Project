@@ -5,7 +5,7 @@ from aiokafka.errors import KafkaConnectionError
 from ..email_services import send_email
 from .. import setting
 import json
-import aiohttp
+
 
 loop = asyncio.get_event_loop()
 logging.basicConfig(level=logging.INFO)

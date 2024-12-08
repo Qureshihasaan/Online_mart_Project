@@ -2,8 +2,7 @@ import smtplib , logging , asyncio
 from email.mime.text import MIMEText
 from fastapi import HTTPException
 from . import setting
-import aiohttp
-import aiohttp
+
 
 
 loop = asyncio.get_event_loop()
@@ -12,13 +11,6 @@ logging.basicConfig(level=logging.INFO)
 
 # async def fetch_user_email(user_id : int):
 #     try:
-        
-
-
-
-
-
-
 
 
 async def send_email(user_email : str , body : str , subject : str):

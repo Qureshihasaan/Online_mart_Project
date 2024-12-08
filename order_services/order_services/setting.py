@@ -20,6 +20,7 @@ TEST_DATABASE_URL =config("TEST_DATABASE_URL" , cast=Secret)
 
 KAFKA_TOPIC_FROM_USER_TO_ORDER = config("KAFKA_TOPIC_FROM_USER_TO_ORDER", cast=str)
 
+# KAFKA_ORDER_STATUS_TOPIC = config("KAFKA_ORDER_STATUS_TOPIC", cast=str)
 
 # SECRET_KEY = config("SECRET_KEY" , cast=str)
 # ALGORITHM = config("ALGORITHM", cast=str)

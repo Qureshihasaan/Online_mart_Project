@@ -199,14 +199,3 @@ def delete_inventory(product_id):
         # finally:
         #     await consumer.stop()
 
-# def process_product_messages():
-#     with Session(engine) as session:
-#         for message in consume_message:
-#             product_data = message.value
-#             print(f"Received Product data: {product_data}")
-
-#             inventory_item = Stock_update(product_id=product_data["id"] , product_quantity=0)
-#             session.add(inventory_item)
-#             session.commit()
-#             print(f"Product added to inventory: {inventory_item}")
-

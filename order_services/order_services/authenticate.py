@@ -1,34 +1,33 @@
-# # from fastapi.security import OAuth2PasswordBearer
-# from jose import jwt , JWTError
-# from fastapi import Depends , HTTPException , status , Header
-# # from typing import Annotated
-# import os
-# from typing import Optional
-# from datetime import datetime, timedelta
-# from fastapi.security import OAuth2PasswordBearer
-# # from passlib.context import CryptContext
-# from pydantic import BaseModel
-
-# SECRET_KEY = os.environ.get("SECRET_KEY")   
-# ALGORITHM = os.environ.get("ALGORITHM")
-# ACCESS_TOKEN_EXPIRE_MINUTES = 10
-
-# def create_access_token(username : str , user_id : int , expires_delta : timedelta):
-#     encode = {"sub" : username, "id" : user_id}
-#     expires = datetime.utcnow() + expires_delta
-#     encode.update({"exp" : expires})
-#     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
+from fastapi.security import OAuth2PasswordBearer
+from jose import jwt , JWTError
+from fastapi import Depends , HTTPException , status
+import os
+from fastapi.security import HTTPBearer
+# from passlib.context import CryptContext
+from pydantic import BaseModel
+from datetime import datetime , timedelta
 
 
-# def decode_access_token(access_token : str):
-#     decoded_jwt = jwt.decode(access_token , SECRET_KEY , algorithms=[ALGORITHM])
-#     return decoded_jwt
+SECRET_KEY = os.environ.get("SECRET_KEY" , "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7")   
+ALGORITHM = os.environ.get("ALGORITHM" , "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = 10
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="http://localhost:8002/docs/login")
 
-
-# def verify_access_token(token:str):
-#     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-#     return payload
+def verify_token(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if datetime.utcnow() > datetime.utcfromtimestamp(payload["exp"]):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token has expired",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return payload
+    except JWTError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     
-
-

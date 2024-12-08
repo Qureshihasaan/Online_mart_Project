@@ -16,6 +16,7 @@ psycopg2 = "^2.9.10"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 pydantic = {extras = ["email"], version = "^2.10.1"}
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-multipart = "^0.0.19"
 
 
 [build-system]

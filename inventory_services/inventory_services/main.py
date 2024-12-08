@@ -11,6 +11,12 @@ from .producer import kafka_producer1
 from aiokafka import AIOKafkaProducer
 # from .event_consuming import consume_product_events
 from . import setting
+import logging
+
+loop = asyncio.get_event_loop()
+logging.basicConfig(level=logging.INFO)
+
+
 
 @asynccontextmanager
 async def lifespan(app : FastAPI)->AsyncGenerator[None, None]:
@@ -20,6 +26,9 @@ async def lifespan(app : FastAPI)->AsyncGenerator[None, None]:
     yield 
             
             
+
+
+
             
 app : FastAPI = FastAPI(lifespan=lifespan , version="1.0.0")
 
