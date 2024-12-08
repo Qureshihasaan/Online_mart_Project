@@ -27,3 +27,5 @@ Online Mart is a scalable and secure e-commerce platform with separate services 
 # 🚀 Getting Started
 ## 1. Clone the Repository
  
+```git clone https://github.com/Qureshihasaan/Online_mart_Project```
+```cd Online_mart_Project```
