@@ -30,3 +30,20 @@ Online Mart is a scalable and secure e-commerce platform with separate services 
 ``` git clone https://github.com/Qureshihasaan/Online_mart_Project ```
 
 ``` cd Online_mart_Project ```
+
+## 2. Build and run Docker containers:
+
+``` docker compose up --build ```
+
+## 3. Access the API documentation:
+
+#### visit the swagger UI at:
+``` http://localhost:8000/docs ```
+
+# 🔧 Environment Variables
+### Create a .env file in the root directory with the following:
+
+``` DATABASE_URL=postgresql://user:password@localhost:5432/dbname ```
+``` SECRET_KEY=your_secret_key ```
+``` ACCESS_TOKEN_EXPIRE_MINUTES=30 ```
+``` KAFKA_BROKER=localhost:9092 ```
